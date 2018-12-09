@@ -5,7 +5,7 @@ body {
 div#pins {
     display: flex;
     /* border: solid; */
-    width: 400px;
+    /* width: 400px; */
 }
 
 #pins ul {
@@ -101,6 +101,7 @@ li.pin:nth-child(odd) .label {
     width: 1.2rem;
     text-align: center;
     font-size: 0.9em;
+    display: flex;
 }
 
 li.pin.PIN_POWER3 .number {
@@ -174,10 +175,14 @@ li.pin:nth-child(even) .label {
 
 li.tag-item {
     margin: 0;
+    color: white;
     padding: 0;
     list-style: none;
-    font-size: .8em;
-    color: #AAA;
+    font-size: 0.7em;
+    /* color: #AAA; */
+    padding: 0.3em 0.5em;
+    margin: 0.1em;
+    border-radius: 3px;
 }
 
 .type.raw {

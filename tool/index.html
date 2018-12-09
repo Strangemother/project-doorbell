@@ -15,6 +15,7 @@
                 <li class="pin" v-for='cell in cells' :class='[cell.type]'>
                     <div  @click='clickPin(cell)' class="number">{{ cell.number }}</div>
                     <div class="label" @click='clickPinLabel(cell)'>
+
                         <div class="visible">
                             <div class="icon hidden">
                                 <i class="material-icons">{{ cell.icon }}</i>
@@ -25,7 +26,7 @@
                                 <div :class="['friendly', {hidden: !cell.config.show}]">{{ cell.friendly }}</div>
                                 <div v-if='cell.friendly == undefined' class="type value">{{ cell.type }}</div>
                                 <ul class='tags'>
-                                    <li :class="['tag-item tag', item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>{{ item.name }}</li>
+                                    <li :style='{background: item.parent.color}' :class="['tag-item tag', key, item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>{{ item.name }}</li>
                                 </ul>
                             </div>
                         </div>

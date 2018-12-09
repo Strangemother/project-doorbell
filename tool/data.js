@@ -1,5 +1,5 @@
 const GPCLK = 'PIN_GPCLK'
-const DPI = 'PIN_DPI'
+//const DPI = 'PIN_DPI'
 const JTAG = 'PIN_JTAG'
 const PCM = 'PIN_PCM'
 const SDIO = 'PIN_SDIO'
@@ -76,6 +76,7 @@ var pi3 = {
         , [GPCLK]: {
             label: 'General Purpose CLock'
             , show: true
+            , color: '#389497'
             , desc: 'General Purpose Clock pins can be set up to output a fixed frequency without any ongoing software control.'
             , pins: [
                 altPin(PIN._7, 'GPCLK0')
@@ -86,6 +87,7 @@ var pi3 = {
         , [JTAG]: {
             label: "Joint Test Action Group"
             , show: false
+            , color: '#384697'
             , desc: "JTAG is a standardised interface for debugging integrated circuits which you can use to debug your Raspberry Pi."
             , pins: [
                 // JTAG pin    “ALT4” mode “ALT5” mode
@@ -108,6 +110,7 @@ var pi3 = {
         , [PCM]: {
             label: "Pulse-code Modulation"
             , show: true
+            , color: '#976f38'
             , desc: "PCM (Pulse-code Modulation) is a digital representation of sampled analog. On the Raspberry Pi it's a form of digital audio output which can be understood by a DAC for high quality sound."
             , pins: [
                 altPin(GPIO._18, 'CLK')
@@ -119,6 +122,7 @@ var pi3 = {
         , [SDIO]: {
             label:"SD Card Interface"
             , show: true
+            , color: '#8bc34a'
             , desc: 'SDIO is the SD host/eMMC interface on the Raspberry Pi. SD host signals are normally used for the microSD slot.\nThese pins are "SD host" on Alt0 and "eMMC" on Alt3.'
              , pins: [
                 altPin(GPIO._16, 'CMD')
@@ -131,6 +135,7 @@ var pi3 = {
         }
         , "I2C": {
             label: "Inter Integrated Circuit"
+            , color: '#53c27d'
             , desc: "I2C pins in BCM mode are: 2, 3\nI2C pins in WiringPi are: 8, 9\nThe Raspberry Pi's I2C pins are an extremely useful way to talk to many different types of external peripheral; from the MCP23017 digital IO expander, to a connected ATmega. \nThe I2C pins include a fixed 1.8 kohms pull-up resistor to 3.3v. This means they are not suitable for use as general purpose IO where a pull-up is not required."
             , show: false
             , pins: [
@@ -144,6 +149,7 @@ var pi3 = {
         , "SPI": {
             label: "Serial Peripheral Interface"
             , show: true
+            , color: '#be3636'
             , desc: `SPI0 pins in BCM mode are: 9, 10, 11 + 7/8
                 SPI0 pins in WiringPi are: 12, 13, 14 + 10/11
                 Known as the four-wire serial bus, SPI lets you daisy-chain multiple compatible devices off a single set of pins by assigning them different chip-select pins.
@@ -166,6 +172,7 @@ var pi3 = {
         , "UART":{
             label: "Universal Asynchronous Receiver/Transmitter"
             , show: false
+            , color: '#8d4797'
             , desc: `UART pins in BCM mode are: 14, 15
                 UART pins in WiringPi are: 15, 16
                 UART is an asynchronous serial communication protocol, meaning that it takes bytes of data and transmits the individual bits in a sequential fashion.
@@ -180,6 +187,7 @@ var pi3 = {
         }
         , "WiringPi": {
             label: 'WiringPi'
+            , color: '#524797'
             , show: false
             , desc: `WiringPi is an attempt to bring Arduino-wiring-like simplicity to the Raspberry Pi.
                 The goal is to have a single common platform and set of functions for accessing the Raspberry Pi GPIO across multiple languages. WiringPi is a C library at heart, but it's available to both Ruby and Python users who can "gem install wiringpi" or "pip install wiringpi2" respectively.
@@ -217,9 +225,10 @@ var pi3 = {
             ]
         }
 
-        , [DPI]: {
+        , 'DPI': {
             label: 'Display Parallel Interface'
             , show: false
+            , color: '#808080'
             , desc: "One of the alternate functions selectable on bank 0 of the Raspbery Pi GPIO is DPI. DPI (Display Parallel Interface) is a 24-bit parallel interface with 28 clock and synchronisation signals. \n This interface allows parallel RGB displays to be attached to the Raspberry Pi GPIO either in RGB24 (8 bits for red, green and blue) or RGB666 (6 bits per colour) or RGB565 (5 bits red, 6 green, and 5 blue). It is available as alternate function 2 (ALT2) on GPIO bank 0. \n The pinout presented here is for the RGB24 mode, see url below for documentation of the RGB666 and RGB565 modes."
             , pins: [
                 altPin(GPIO._0, 'PCLK')

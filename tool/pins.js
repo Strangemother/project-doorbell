@@ -86,17 +86,18 @@ var loadConfig = function(entity){
         if(entity.config[name].pins == undefined) {
             continue
         }
+
         for (var i = 0; i < entity.config[name].pins.length; i++) {
             let altPin = entity.config[name].pins[i]
             if(altPin == undefined) {
                 console.log('undefined pin', name, i)
                 continue
             }
+
             altPin.parent = entity.config[name]
             altPin.for.alt.push(altPin)
         }
     }
-
 
     let newPins = []
     for (var i = 0; i < entity.pins.length; i++) {
