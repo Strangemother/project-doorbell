@@ -17,10 +17,6 @@ path {
   height: 100px;
 }
 
-#path3 {stroke-width: 0.5em;}
-#path5 {stroke-width: 0.8em;}
-#path6 {stroke-width: 0.8em;}
-
 #outer{
   width:  80%;
   margin: 0 auto;
@@ -39,7 +35,7 @@ path {
   width:  6em;
   height: 6em;
   margin-left: 10%;
-  background-color: teal;
+  background-color: #00808063;
 }
 
 #outer #orange{
@@ -48,7 +44,7 @@ path {
   padding: 2em 4em;
   margin-top:  6em;
   margin-left: 8em;
-  background-color: orange;
+  background-color: #ae884466;
 }
 
 #outer #red{
@@ -56,14 +52,14 @@ path {
   height:  4em;
   padding: 4em 3em;
   margin-left: 30%;
-  background-color: red;
+  background-color: #c61818ad;
 }
 
 #outer #aqua{
 	width:  5em;
 	height: 5em;
 	margin-left: 15%;
-	background-color: aqua;
+	background-color: #00ffff8a;
 }
 
 #outer #purple{

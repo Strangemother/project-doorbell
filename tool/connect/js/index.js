@@ -15,90 +15,260 @@ let arc = function(rx, ry, xrot, large, sweep, x, y){
         return `A${o.rx} ${o.ry} ${o.xrot || 0} ${o.large?1: 0} ${o.sweep? 1: 0} ${o.x} ${o.y}`
     }
 
-    let move = function(x, y){
-        return `M${x} ${y}`
-    }
+let move = function(x, y){
+    return `M${x} ${y}`
+}
 
-    let vert = function(length) {
-        return `V${length}`
-    }
+let vert = function(length) {
+    return `V${length}`
+}
 
-    let horiz = function(length) {
-        return `H${length}`
-    }
+let horiz = function(length) {
+    return `H${length}`
+}
 
-var adaptDrawLayer = function(svg, startX, startY, endX, endY, padding) {
+var adaptDrawLayer = function(svg, coord, padding) {
     // check if the svg is big enough to draw the path, if not, set heigh/width
-    if (svg.attr("height") <  endY)  {
-        svg.attr("height", endY);
+    if (svg.attr("height") <  coord.by)  {
+        svg.attr("height", coord.by);
     }
-    if (svg.attr("width" ) < (startX + padding) ) {
-        svg.attr("width", (startX + padding));
+
+    if (svg.attr("width" ) < (coord.ax + padding) ) {
+        svg.attr("width", (coord.ax + padding));
     }
-    if (svg.attr("width" ) < (endX   + padding) ) {
-        svg.attr("width", (endX   + padding));
+
+    if (svg.attr("width" ) < (coord.bx   + padding) ) {
+        svg.attr("width", (coord.bx   + padding));
     }
 }
 
-function drawPath(svg, path, startX, startY, endX, endY) {
+function drawPath(svg, path, _path, coord) {
     // get the path's stroke width (if one wanted to be  really precize, one could use half the stroke size)
 
     var stroke =  parseFloat(path.css("stroke-width"));
-    adaptDrawLayer(svg, startX, startY, endX, endY, stroke)
+    adaptDrawLayer(svg, coord, stroke, 100)
+    //A${delta} ${delta} 0 0 ${arc1} ${(startX + delta*signum(deltaX))} ${startY + 2*delta}
+    let l = _path.join(' ')
+    path.attr("d", l)
+}
 
+
+var getDeltaVert = function(startX, startY, endX, endY, max){
     var deltaX = (endX - startX) * 0.05;
     var deltaY = (endY - startY) * 0.05;
-    var val = 12
+    var val = max
     var valX = val
     var valY = val
+
     if(deltaX < 0) { valX = -val}
     if(deltaY < 0) { valY = -val}
+
     deltaX = Math.min(deltaX, valX)
     deltaY = Math.min(deltaY, valY)
     // for further calculations which ever is the shortest distance
     var delta  =  deltaY < absolute(deltaX) ? deltaY : absolute(deltaX);
 
+    return {
+        deltaX, deltaY, delta
+    }
+}
 
+var getDeltaHoriz = function(startX, startY, endX, endY, max){
+    var deltaX = (endX - startX) * 0.05;
+    var deltaY = (endY - startY) * 0.05;
+    var val = max
+    var valX = val
+    var valY = val
+
+    if(deltaX < 0) { valX = -val}
+    if(deltaY < 0) { valY = -val}
+
+    deltaX = Math.min(deltaX, valX)
+    deltaY = Math.min(deltaY, valY)
+    // for further calculations which ever is the shortest distance
+    var delta  =  deltaY < absolute(deltaX) ? deltaY : absolute(deltaX);
+
+    return {
+        deltaX, deltaY, delta
+    }
+}
+
+var isAbs = function(c) {
+    let max = 5
+    let v = absolute(c.bx-c.ax)
+    let vy = absolute(c.by-c.ay)
+    return (vy < 5 || v < 5)
+}
+
+var vert2Pipe = function(c){
+    /* A pipe from A (top) to B (bottom) with two joints*/
+
+    if(isAbs(c)) {
+        return verticalPipe(c)
+    }
+
+    let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
     // draw tha pipe-like path
     // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
-
+    let jointOffset = c.height / 3
     let arcA = arc({
-        rx:delta
-        , ry:delta
+        rx:d3.delta
+        , ry:d3.delta
         // set sweep-flag (counter/clock-wise)
         // if start element is closer to the left edge,
         // draw the first arc counter-clockwise, and the second one clock-wise
-        , sweep: startX > endX // left or right bool.
-        , x: startX + delta*signum(deltaX)
-        , y: startY + 2*delta
+        , sweep: c.ax > c.bx // left or right bool.
+        , x: c.ax + d3.delta*signum(d3.deltaX)
+        , y: c.ay + jointOffset + 2*d3.delta
     })
 
     let arcB = arc({
-        rx:delta
-        , ry:delta
-        , sweep: startX <= endX // left or right bool.
-        , x: endX
-        , y: startY + 3*delta
+        rx:d3.delta
+        , ry:d3.delta
+        , sweep: c.ax <= c.bx // left or right bool.
+        , x: c.bx
+        , y: c.ay  + jointOffset+ 3*d3.delta
     })
 
-    //A${delta} ${delta} 0 0 ${arc1} ${(startX + delta*signum(deltaX))} ${startY + 2*delta}
-    let l = `${move(startX, startY)}
-        ${vert(startY + delta)}
-        ${arcA}
-        ${horiz(endX - delta*signum(deltaX))}
-        ${arcB}
-        ${vert(endY)}`
+    return [
+        move(c.ax, c.ay)
+        , vert(c.ay + d3.delta + jointOffset)
+        , arcA
+        , horiz(c.bx - d3.delta*signum(d3.deltaX))
+        , arcB
+        , vert(c.by)
+    ]
 
-    path.attr("d", l)
 }
 
-var down2Pipe = function(){
-    /* A pipe from A (top) to B (bottom) with two joints*/
-    drawPath(svg, path, startX, startY, endX, endY)
+var horiz2Pipe = function(c) {
+    if(isAbs(c)) {
+        return horizPipe(c)
+    }
+
+    let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
+    // draw tha pipe-like path
+    // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
+    let jointOffset = 200
+    let arcA = arc({
+        rx:d3.delta
+        , ry:d3.delta- jointOffset+d3.delta*signum(d3.deltaY)
+        // set sweep-flag (counter/clock-wise)
+        // if start element is closer to the left edge,
+        // draw the first arc counter-clockwise, and the second one clock-wise
+        , sweep: c.ax < c.bx // left or right bool.
+        , x: c.bx - jointOffset+d3.delta*signum(d3.deltaX)
+        , y: c.ay + jointOffset + 2*d3.delta
+    })
+
+    return [
+        move(c.ax + 10, c.ay)
+        , horiz(c.bx - (c.bx * .1))// - jointOffset)
+        //, arcA
+        , vert(c.by)
+        , horiz(c.bx)
+
+    ]
+
 }
 
-function connectElements(svg, path, startElem, endElem) {
+var verticalPipe = function(c){
+    return movePipe(c, vert)
+}
+
+var horizPipe = function(c){
+    return movePipe(c, horiz)
+}
+
+var movePipe = function(c, direction){
+    return [
+      move(c.ax, c.ay)
+      , direction(c.by)
+    ]
+}
+
+class Coords {
+    constructor(ax,ay) {
+        this.x = ax
+        this.y = ay
+    }
+}
+
+class Coords2 {
+    constructor(ax,ay, bx, by) {
+        this.ax = ax
+        this.ay = ay
+        this.bx = bx
+        this.by = by
+    }
+
+    get a(){
+        return new Coords(this.ax, this.ay)
+    }
+
+    get b(){
+        return new Coords(this.bx, this.by)
+    }
+
+    get height(){
+        return this.by - this.ay
+    }
+}
+
+var getXY = function(elem, pos){
+    var startCoord = elem.offset();
     var svgContainer= $("#svgContainer");
+    // get (top, left) corner coordinates of the svg container
+    var svgTop  = svgContainer.offset().top;
+    var svgLeft = svgContainer.offset().left;
+
+    let o = {
+        x:startCoord.left + 0.5*elem.outerWidth() - svgLeft    // x = left offset + 0.5*width - svg's left offset
+        , y:startCoord.top/*  + elem.outerHeight()*/ - svgTop        // y = top offset + height - svg's top offset
+    }
+
+    if(pos.indexOf('top') > -1 ) {
+        o.y = startCoord.top/*  + elem.outerHeight()*/ - svgTop
+    }
+
+    if(pos.indexOf('bottom') > -1 ){
+        o.y =startCoord.top + elem.outerHeight() - svgTop
+    }
+    
+    if(pos.indexOf('right') > -1 ) {
+        if(pos.indexOf('center') > -1) {
+            o.y =startCoord.top + (elem.outerHeight() * .5) - svgTop
+        }
+        o.x =startCoord.left + (elem.outerWidth() * .94) - svgTop
+    }
+
+    if(pos.indexOf('left') > -1 ) {
+        o.y =startCoord.top + (elem.outerHeight() * .5) - svgTop
+        o.x =startCoord.left// - (elem.outerWidth())
+    }
+
+    return o
+}
+
+function getCoordsVertSpan(startElem, endElem, anchorA, anchorB){
+    // get (top, left) coordinates for the two elements
+    // calculate path's start (x,y)  coords
+    // we want the x coordinate to visually result in the element's mid point
+    var start = getXY(startElem, anchorA || 'bottom')
+    var end = getXY(endElem, anchorB || 'top')
+    return new Coords2(start.x, start.y, end.x, end.y)
+}
+
+function getCoordsHorizSpan(startElem, endElem, anchorA, anchorB){
+    // get (top, left) coordinates for the two elements
+    // calculate path's start (x,y)  coords
+    // we want the x coordinate to visually result in the element's mid point
+    var start = getXY(startElem, [anchorA || 'right', 'center'])
+    var end = getXY(endElem, [anchorB || 'left'])
+    return new Coords2(start.x, start.y, end.x, end.y)
+}
+
+function connectElements(svg, path, startElem, endElem, config) {
 
     // if first element is lower than the second, swap!
     if(startElem.offset().top > endElem.offset().top){
@@ -107,25 +277,14 @@ function connectElements(svg, path, startElem, endElem) {
         endElem = temp;
     }
 
-    // get (top, left) corner coordinates of the svg container
-    var svgTop  = svgContainer.offset().top;
-    var svgLeft = svgContainer.offset().left;
-
-    // get (top, left) coordinates for the two elements
-    var startCoord = startElem.offset();
-    var endCoord   = endElem.offset();
-
-    // calculate path's start (x,y)  coords
-    // we want the x coordinate to visually result in the element's mid point
-    var startX = startCoord.left + 0.5*startElem.outerWidth() - svgLeft;    // x = left offset + 0.5*width - svg's left offset
-    var startY = startCoord.top  + startElem.outerHeight() - svgTop;        // y = top offset + height - svg's top offset
-
-        // calculate path's end (x,y) coords
-    var endX = endCoord.left + 0.5*endElem.outerWidth() - svgLeft;
-    var endY = endCoord.top  - svgTop;
-
     // call function for drawing the path
-    drawPath(svg, path, startX, startY, endX, endY);
+    let name = config.direction || 'vert'
+    let coord = getCoordsVertSpan(startElem, endElem)
+    if(name == 'horiz') {
+        coord = getCoordsHorizSpan(startElem, endElem)
+    }
+    let pipe = window[`${name}2Pipe`](coord);
+    drawPath(svg, path, pipe, coord)
 }
 
 function resetSVGsize(){
@@ -134,12 +293,12 @@ function resetSVGsize(){
 }
 
 var lines = [
-    ["teal", "orange"]
-    , ["red", "orange"]
-    , ["teal", "aqua"]
-    , ["red", "aqua"]
-    , ["purple", "teal"]
-    , ["orange", "green"]
+    ["teal", "orange", { direction: ['vert']}]
+    //, ["red", "orange"]
+    // , ["teal", "aqua"]
+    , ["red", "aqua", { direction:['horiz']}]
+    // , ["purple", "teal"]
+    // , ["orange", "green"]
 ]
 
 class Paths {
@@ -177,7 +336,13 @@ function connectAll() {
 
     // connect all the paths you want!
     for (var i = 0; i < lines.length; i++) {
-        let [a,b] = lines[i]
+        let a,b,c = {}
+        if(lines[i].length == 2){
+            [a,b] = lines[i]
+        }
+        if(lines[i].length == 3){
+            [a,b,c] = lines[i]
+        }
 
         let name = `path${i+1}`;
         let $path = $(`#${name}`)
@@ -193,7 +358,7 @@ function connectAll() {
             $path = $(`#${name}`)
         }
 
-        connectElements(svg, $path, $(`#${a}`),   $(`#${b}`));
+        connectElements(svg, $path, $(`#${a}`),   $(`#${b}`), c);
     }
 
 }
@@ -261,6 +426,14 @@ function quick_demo(){
   else        $("#outer").css({'width': ''});
 
 }
+
+;(function(){
+   var renderFrame = function(){
+       window.setTimeout(function(){
+        requestAnimationFrame(renderFrame)
+       }, 100)
+   }
+})()
 
 
 $(document).ready(function() {
