@@ -3,17 +3,19 @@ div{  opacity: 1; }
 
 #svgContainer {
   z-index: -10;
-  opacity:  0.5;
-  margin:   2.5em 2.5em;
+  /* opacity:  0.5; */
+  /* margin:   2.5em 2.5em; */
   position: absolute;
-  background-color: #999;
+  background-color: #dadada;
+  /* width: 98%; */
+  /* height: 97%; */
 }
 
 path {
   fill:   none;
-  stroke: #000;
+  /* stroke: #000; */
   width: 50px;
-  stroke-width: 0.7em;
+  stroke-width: 0.2em;
   height: 100px;
 }
 
@@ -35,7 +37,7 @@ path {
   width:  6em;
   height: 6em;
   margin-left: 10%;
-  background-color: #00808063;
+  background-color: #008080;
 }
 
 #outer #orange{
@@ -44,7 +46,7 @@ path {
   padding: 2em 4em;
   margin-top:  6em;
   margin-left: 8em;
-  background-color: #ae884466;
+  background-color: #b0701e;
 }
 
 #outer #red{
@@ -52,14 +54,14 @@ path {
   height:  4em;
   padding: 4em 3em;
   margin-left: 30%;
-  background-color: #c61818ad;
+  background-color: #8b2424;
 }
 
 #outer #aqua{
 	width:  5em;
 	height: 5em;
 	margin-left: 15%;
-	background-color: #00ffff8a;
+	background-color: #0697d1;
 }
 
 #outer #purple{
@@ -74,4 +76,36 @@ path {
 	margin-top:  2em;
 	margin-left: 50%;
 	background-color: green;
+}
+
+
+@keyframes marching_ants {
+  0%   {stroke-dashoffset: 0;}
+  100% {stroke-dashoffset: 8*2;}
+}
+
+.ants {
+  stroke: black;
+  stroke-width: 2px;
+  stroke-dasharray: 5px 3px;
+  animation: marching-ants 1s linear infinite;
+  fill: none;
+}
+
+.slow {
+  animation: marching-ants 2.5s linear infinite;
+}
+
+.fast {
+  animation: marching-ants .3s linear infinite;
+}
+
+@keyframes marching-ants {
+  to {
+    stroke-dashoffset: -15px;
+  }
+}
+
+button{
+  padding: 1.5em;
 }
