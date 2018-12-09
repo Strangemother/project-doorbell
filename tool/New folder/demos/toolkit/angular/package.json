@@ -1,0 +1,31 @@
+{
+  "name": "yfiles.demo.angular-cli",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --open",
+    "build": "ng build --prod --build-optimizer=false"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "7.0.2",
+    "@angular/common": "7.0.2",
+    "@angular/compiler": "7.0.2",
+    "@angular/core": "7.0.2",
+    "@angular/forms": "7.0.2",
+    "@angular/http": "7.0.2",
+    "@angular/platform-browser": "7.0.2",
+    "@angular/platform-browser-dynamic": "7.0.2",
+    "@angular/router": "7.0.2",
+    "core-js": "2.5.7",
+    "rxjs": "6.3.3",
+    "zone.js": "0.8.26"
+  },
+  "devDependencies": {
+    "@angular/cli": "7.0.4",
+    "@angular/compiler-cli": "7.0.2",
+    "@angular/language-service": "7.0.2",
+    "typescript": "3.1.6",
+    "@angular-devkit/build-angular": "0.10.4"
+  }
+}

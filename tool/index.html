@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RASPI</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+</head>
+<body>
+
+    <div id="pi">
+        <div id="pins">
+            <ul>
+                <li class="pin" v-for='cell in cells' :class='[cell.type]'>
+                    <div  @click='clickPin(cell)' class="number">{{ cell.number }}</div>
+                    <div class="label" @click='clickPinLabel(cell)'>
+                        <div class="visible">
+                            <div class="icon hidden">
+                                <i class="material-icons">{{ cell.icon }}</i>
+                            </div>
+
+                            <div class="type raw">
+
+                                <div :class="['friendly', {hidden: !cell.config.show}]">{{ cell.friendly }}</div>
+                                <div v-if='cell.friendly == undefined' class="type value">{{ cell.type }}</div>
+                                <ul class='tags'>
+                                    <li :class="['tag-item tag', item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>{{ item.name }}</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="gpio">
+                            <i class="material-icons">{{ cell.icon }}</i>
+                            <span v-if='cell.gpio'>{{ cell.gpio }}</span>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="options">
+        <ul class="options">
+            <li class="option-item" v-for='(item, key) in viewOpts'>
+                <label>
+                    <input type="checkbox" v-model='item.show' @click='showClick'>
+                        <span class="label-value">{{ key }}</span>
+                </label>
+            </li>
+        </ul>
+    </div>
+    <script src="vue.js"></script>
+    <script src="pins.js"></script>
+    <script src="data.js"></script>
+    <script src="index.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+</body>
+</html>
