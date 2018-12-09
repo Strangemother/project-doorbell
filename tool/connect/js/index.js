@@ -143,33 +143,50 @@ var vert2Pipe = function(c){
 
 var horiz2Pipe = function(c) {
     if(isAbs(c)) {
+        
         return horizPipe(c)
     }
 
-    let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
+
     // draw tha pipe-like path
     // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
-    let jointOffset = 200
+
+   //d3.delta = 10
+
+    let split = c.bx - ((c.bx - c.ax)/2)
+
+    let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
+   // jointOffset = c.height / 3
+    let jointOffset = d3.delta
+    let fromX = split - jointOffset
+
     let arcA = arc({
-        rx:d3.delta
-        , ry:d3.delta- jointOffset+d3.delta*signum(d3.deltaY)
-        // set sweep-flag (counter/clock-wise)
-        // if start element is closer to the left edge,
-        // draw the first arc counter-clockwise, and the second one clock-wise
+        rx: jointOffset
+        , ry: jointOffset
         , sweep: c.ax < c.bx // left or right bool.
-        , x: c.bx - jointOffset+d3.delta*signum(d3.deltaX)
-        , y: c.ay + jointOffset + 2*d3.delta
+        // x pos of end
+        , x: split
+        , y: c.ay  + jointOffset //+ 3*d3.delta
+    })
+
+    let arcB = arc({
+        rx: jointOffset
+        , ry: jointOffset
+        , sweep: c.ax > c.bx // left or right bool.
+        // x pos of end
+        , x: split + jointOffset *signum(d3.deltaX)
+        , y: c.by //+ 3*d3.delta
     })
 
     return [
-        move(c.ax + 10, c.ay)
-        , horiz(c.bx - (c.bx * .1))// - jointOffset)
-        //, arcA
-        , vert(c.by)
+        move(c.ax, c.ay)
+        , horiz(fromX)
+        , arcA
+        , vert(c.by - jointOffset)
+        , arcB
         , horiz(c.bx)
 
     ]
-
 }
 
 var verticalPipe = function(c){
@@ -213,6 +230,10 @@ class Coords2 {
     get height(){
         return this.by - this.ay
     }
+
+    get width(){
+        return this.bx - this.by
+    }
 }
 
 var getXY = function(elem, pos){
@@ -234,7 +255,7 @@ var getXY = function(elem, pos){
     if(pos.indexOf('bottom') > -1 ){
         o.y =startCoord.top + elem.outerHeight() - svgTop
     }
-    
+
     if(pos.indexOf('right') > -1 ) {
         if(pos.indexOf('center') > -1) {
             o.y =startCoord.top + (elem.outerHeight() * .5) - svgTop
@@ -450,4 +471,8 @@ $(window).resize(function () {
     resetSVGsize();
     connectAll();
 });
+
+
+
+
 
