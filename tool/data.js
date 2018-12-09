@@ -56,22 +56,26 @@ var pi3 = {
             , label: '5V'
             , desc: "The 5v power pins are connected directly to the Pi's power input and will capably provide the full current of your mains adaptor, less that used by the Pi itself. \n With a decent power supply, such as the official Pi adaptor, you can expect to pull about 1.5A. \n Don't be disuaded by what sounds like a measly low voltage. You can do a lot with 5v. Power Arduinos, and even run a small electroluminescent wire inverter right off the 5v pin!"
             , show: true
+            , color: 'red'
         }
         , [POWER3]: {
             icon: 'flash_on'
             , label: '3.3V'
             , desc: "The 3v3 supply pin on the early Raspberry Pi had a maximum available current of about 50 mA. Enough to power a couple of LEDs or a microprocessor, but not much more. \n All Raspberry Pi since the Model B+ can provide quite a bit more, up to 500mA to remain on the safe side, thanks to a switching regulator. \n Still, you should generally use the 5v supply, coupled with a 3v3 regulator for 3.3v projects."
             , show: true
+            , color: '#c21550'
         }
         , [GROUND]:{
             icon:'filter_list'
             , label: 'Ground'
             , desc: "The Ground pins on the Raspberry Pi are all electrically connected, so it doesn't matter which one you use if you're wiring up a voltage supply. \n Generally the one that's most convenient or closest to the rest of your connections is tidier and easier, or alternatively the one closest to the supply pin that you use. \n For example, it's a good idea to use Physical Pin 17 for 3v3 and Physical Pin 25 for ground when using the SPI connections, as these are right next to the important pins for SPI0."
             , show: true
+            , color: '#9e4d47'
         }
         , [GPIO_PIN]: {
             label: 'BCM'
             , show: true
+            , color: '#378965'
         }
         , [GPCLK]: {
             label: 'General Purpose CLock'

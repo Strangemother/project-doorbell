@@ -9,6 +9,29 @@
 </head>
 <body>
 
+    <!-- <div id="one" class="point"></div>
+    <div id="two" class="point"></div>
+    <svg id="svg">
+      <line id="line"/>
+    </svg> -->
+
+    <div id="options">
+        <ul class="options">
+            <li class="option-item" v-for='(item, key) in viewOpts'>
+                <label>
+                    <div :class="[item.show?'show':'not-show','color-label']" :style="{ background: item.color, color: item.color }">
+                        <div class="icon">
+                            <i class="material-icons">{{ item.icon }}</i>
+                        </div>
+                    </div>
+                    <input type="checkbox" v-model='item.show' @click='showClick'>
+                        <span class="label-value">{{ key }}</span>
+                </label>
+            </li>
+        </ul>
+    </div>
+
+
     <div id="pi">
         <div id="pins">
             <ul>
@@ -23,15 +46,17 @@
 
                             <div class="type raw">
 
-                                <div :class="['friendly', {hidden: !cell.config.show}]">{{ cell.friendly }}</div>
+                                <div  :style="{ color: cell.config.color }"
+                                    :class="['friendly', {hidden: !cell.config.show}]">{{ cell.friendly }}</div>
                                 <div v-if='cell.friendly == undefined' class="type value">{{ cell.type }}</div>
+
                                 <ul class='tags'>
                                     <li :style='{background: item.parent.color}' :class="['tag-item tag', key, item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>{{ item.name }}</li>
                                 </ul>
                             </div>
                         </div>
 
-                        <div class="gpio">
+                        <div class="gpio" :style="{ color: cell.config.color }" >
                             <i class="material-icons">{{ cell.icon }}</i>
                             <span v-if='cell.gpio'>{{ cell.gpio }}</span>
                         </div>
@@ -40,17 +65,10 @@
             </ul>
         </div>
     </div>
-
-    <div id="options">
-        <ul class="options">
-            <li class="option-item" v-for='(item, key) in viewOpts'>
-                <label>
-                    <input type="checkbox" v-model='item.show' @click='showClick'>
-                        <span class="label-value">{{ key }}</span>
-                </label>
-            </li>
-        </ul>
-    </div>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+        crossorigin="anonymous"></script>
     <script src="vue.js"></script>
     <script src="pins.js"></script>
     <script src="data.js"></script>
