@@ -12,9 +12,9 @@ var nodes= new Vue({
         ]
         ,  lines: [
             //, ["red", "orange"]
-            ["red", "aqua", { direction: 'auto'}]
-            , ["teal", "orange", { direction: 'vert'}]
-            , ["red", "orange", { direction:'horiz'}]
+            ["red", "aqua", { direction: 'auto', cls: 'ants slow'}]
+            , ["teal", "orange", { direction: 'vert', cls: 'ants slow'}]
+            , ["red", "orange", { direction:'horiz', cls: 'ants slow'}]
             //, ["purple", "teal"]
             // , ["orange", "green"]
         ]

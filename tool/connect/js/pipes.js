@@ -65,6 +65,7 @@ function drawPath(conf) {
     //A${delta} ${delta} 0 0 ${arc1} ${(startX + delta*signum(deltaX))} ${startY + 2*delta}
     let l = conf.pipe.join(' ')
     conf.path.attr("d", l)
+    conf.path.attr('class', conf.cls)
 }
 
 
@@ -359,7 +360,7 @@ function connectElements(svg, path, startElem, endElem, config) {
         console.log('Function', name, 'does not exist')
         return []
     }
-    let conf = {svg, reverse, path, coord}
+    let conf = Object.assign({}, config, {svg, reverse, path, coord})
     conf.pipe = func(conf);
     drawPath(conf)
 }
