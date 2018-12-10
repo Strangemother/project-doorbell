@@ -58,7 +58,7 @@ var adaptDrawLayer = function(conf) {
 function drawPath(conf) {
     // get the path's stroke width (if one wanted to be  really precize, one could use half the stroke size)
     //svg, path, _path, coord
- 
+
     conf.stroke =  parseFloat(conf.path.css("stroke-width"));
     conf.padding = 200
     adaptDrawLayer(conf)
@@ -110,47 +110,74 @@ var getDeltaHoriz = function(startX, startY, endX, endY, max){
 
 var isAbs = function(conf) {
     let max = 5
-    let c = conf//.coord 
+    let c = conf//.coord
     let v = absolute(c.bx-c.ax)
     let vy = absolute(c.by-c.ay)
     return (vy < 5 || v < 5)
 }
 
+var auto2Pipe = function(conf){
+    let c= conf.coord;
+
+    let above = c.ay < c.by
+
+    if(above) return horiz2Pipe(conf)
+    return vert2Pipe(conf)
+}
+
 var vert2Pipe = function(conf){
     /* A pipe from A (top) to B (bottom) with two joints*/
-    let c = conf//.coord
+    let c = conf.coord
     if(isAbs(c)) {
         return verticalPipe(c)
     }
-
+    console.log(c._a.id, c._b.id, c.ay, c.by)
     let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
     // draw tha pipe-like path
     // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
     let jointOffset = c.height / 3
-    let arcA = arc({
+    let rev = conf.reverse
+    let va = c.ax > c.bx ? jointOffset: jointOffset
+    let av = {
         rx:d3.delta
         , ry:d3.delta
         // set sweep-flag (counter/clock-wise)
         // if start element is closer to the left edge,
         // draw the first arc counter-clockwise, and the second one clock-wise
-        , sweep: c.ax > c.bx // left or right bool.
+        , sweep: rev? c.ax < c.bx: c.ax > c.bx // left or right bool.
         , x: c.ax + d3.delta*signum(d3.deltaX)
         , y: c.ay + jointOffset + 2*d3.delta
-    })
+    }
 
-    let arcB = arc({
-        rx:d3.delta
-        , ry:d3.delta
-        , sweep: c.ax <= c.bx // left or right bool.
+    if(rev){
+         av.x = c.ax - d3.delta*signum(d3.deltaX)
+         av.y = c.ay + jointOffset + 2*d3.delta
+    }
+
+    let arcA = arc(av)
+
+    var ab = {
+        rx: d3.delta  //+ jointOffset
+        , ry:d3.delta //+ jointOffset
+       // , sweep:c.ax > c.bx // left or right bool.
+       , sweep: rev?c.ax > c.bx:c.ax < c.bx // left or right bool.
         , x: c.bx
-        , y: c.ay  + jointOffset+ 3*d3.delta
-    })
+        , y: (c.ay + jointOffset + 3*d3.delta)
+    }
+
+
+    var flip = false;
+    if(flip) {
+        ab.sweep = c.ax > c.bx
+    }
+
+    let arcB = arc(ab)
 
     return [
         move(c.ax, c.ay)
         , vert(c.ay + d3.delta + jointOffset)
         , arcA
-        , horiz(c.bx - d3.delta*signum(d3.deltaX))
+        , horiz((c.bx + d3.delta*signum(d3.deltaX)) )
         , arcB
         , vert(c.by)
     ]
@@ -158,7 +185,7 @@ var vert2Pipe = function(conf){
 }
 
 var horiz2Pipe = function(conf) {
-    let c = conf 
+    let c = conf.coord
     if(isAbs(c)) {
         return horizPipe(c)
     }
@@ -221,15 +248,6 @@ var horiz2Pipe = function(conf) {
 var verticalPipe = function(conf){
     let c= conf//.coord;
     return movePipe(c, vert)
-}
-
-var auto2Pipe = function(conf){
-    let c= conf.coord;
-    
-    let above = c.ay < c.by
-    console.log(c._a.id, c._b.id, c.ay, c.by, above)
-    if(above) return horiz2Pipe(c)
-    return vert2Pipe(c)
 }
 
 var horizPipe = function(conf){
@@ -327,7 +345,7 @@ function connectElements(svg, path, startElem, endElem, config) {
          //var temp = startElem;
          //startElem = endElem;
          //endElem = temp;
-     
+
 
     // call function for drawing the path
     let name = config.direction || 'vert'
@@ -389,7 +407,7 @@ function connectAll() {
     for (var i = 0; i < lines.length; i++) {
         let a,b,c = {}
         if(lines[i].length == 2){
-            [a,b] = lines[i] 
+            [a,b] = lines[i]
         }
         if(lines[i].length == 3){
             [a,b,c] = lines[i]
