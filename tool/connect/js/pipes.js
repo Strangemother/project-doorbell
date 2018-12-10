@@ -65,7 +65,7 @@ function drawPath(conf) {
     //A${delta} ${delta} 0 0 ${arc1} ${(startX + delta*signum(deltaX))} ${startY + 2*delta}
     let l = conf.pipe.join(' ')
     conf.path.attr("d", l)
-    conf.path.attr('class', conf.cls)
+    //conf.path.attr('class', conf.cls)
 }
 
 
@@ -132,8 +132,10 @@ var vert2Pipe = function(conf){
     if(isAbs(c)) {
         return verticalPipe(c)
     }
-    console.log(c._a.id, c._b.id, c.ay, c.by)
+    
+    let aAboveB = c.ay > c.by;
     let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
+    console.log(c._a.id, c._b.id, c.ay, c.by, aAboveB)
     // draw tha pipe-like path
     // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
     let jointOffset = c.height / 3
@@ -155,31 +157,34 @@ var vert2Pipe = function(conf){
          av.y = c.ay + jointOffset + 2*d3.delta
     }
 
-    let arcA = arc(av)
-
     var ab = {
-        rx: d3.delta  //+ jointOffset
+        rx: d3.delta //+ jointOffset
         , ry:d3.delta //+ jointOffset
        // , sweep:c.ax > c.bx // left or right bool.
        , sweep: rev?c.ax > c.bx:c.ax < c.bx // left or right bool.
+       , xrot: 0
         , x: c.bx
         , y: (c.ay + jointOffset + 3*d3.delta)
     }
+    
+    let horizLength = (c.bx + d3.delta*signum(d3.deltaX))
 
-
-    var flip = false;
-    if(flip) {
-        ab.sweep = c.ax > c.bx
+    if(!aAboveB) {
+        //ab.rx += 250
+        //ab.rx += 50
+       // ab.y -= d3.delta*signum(d3.deltaX)
+        //ab.x += 
+        horizLength -= (d3.delta*signum(d3.deltaX))*2
+        //console.log(jointOffset)
+        //ab.sweep = !ab.sweep
     }
-
-    let arcB = arc(ab)
 
     return [
         move(c.ax, c.ay)
         , vert(c.ay + d3.delta + jointOffset)
-        , arcA
-        , horiz((c.bx + d3.delta*signum(d3.deltaX)) )
-        , arcB
+        , arc(av)
+        , horiz(horizLength)
+        , arc(ab)
         , vert(c.by)
     ]
 
