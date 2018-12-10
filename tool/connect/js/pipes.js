@@ -135,21 +135,32 @@ var vert2Pipe = function(conf){
 
     let aAboveB = c.ay > c.by;
     let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
-    console.log(c._a.id, c._b.id, c.ay, c.by, aAboveB)
+    
     // draw tha pipe-like path
     // 1. move a bit down, 2. arch,  3. move a bit to the right, 4.arch, 5. move down to the end
     let jointOffset = c.height / 3
     let rev = conf.reverse
     let va = c.ax > c.bx ? jointOffset: jointOffset
+    console.log(c._a.id, c._b.id, c.ay - c.by, jointOffset + 2*d3.delta)
+    let offsetDelta = jointOffset + 2*d3.delta
+    let tOffset = absolute(offsetDelta)
+    let dY = absolute(c.ay - c.by)
+
+    if(dY < tOffset) {
+        console.log('correction required', dY, tOffset)
+        
+
+    }
+
     let av = {
         rx:d3.delta
-        , ry:d3.delta
+        , ry:d3.delta 
         // set sweep-flag (counter/clock-wise)
         // if start element is closer to the left edge,
         // draw the first arc counter-clockwise, and the second one clock-wise
         , sweep: rev? c.ax < c.bx: c.ax > c.bx // left or right bool.
         , x: c.ax + d3.delta*signum(d3.deltaX)
-        , y: c.ay + jointOffset + 2*d3.delta
+        , y: c.ay + tOffset
     }
 
     if(rev){
@@ -162,21 +173,29 @@ var vert2Pipe = function(conf){
         , ry:d3.delta //+ jointOffset
        // , sweep:c.ax > c.bx // left or right bool.
        , sweep: rev?c.ax > c.bx:c.ax < c.bx // left or right bool.
-       , xrot: 0
         , x: c.bx
         , y: (c.ay + jointOffset + 3*d3.delta)
     }
+
 
     let horizLength = (c.bx + d3.delta*signum(d3.deltaX))
 
     if(!aAboveB) {
         //ab.rx += 250
         //ab.rx += 50
-       // ab.y -= d3.delta*signum(d3.deltaX)
+        ab.y = (c.ay + jointOffset + 3*d3.delta)
         //ab.x +=
         horizLength -= (d3.delta*signum(d3.deltaX))*2
         //console.log(jointOffset)
         //ab.sweep = !ab.sweep
+    }
+
+    if(dY < tOffset) {
+        console.log('correction required', dY, tOffset)
+        //tOffset= dY
+        ab.sweep = !ab.sweep
+        ab.x = c.bx// (c.ay + 3*d3.delta) + tOffset
+        ab.y += 20
     }
 
     return [

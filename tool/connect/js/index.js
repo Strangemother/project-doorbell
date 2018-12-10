@@ -14,7 +14,7 @@ var nodes= new Vue({
             //, ["red", "orange"]
             ["red", "aqua", { direction: 'auto', cls: 'ants slow'}]
             , ["teal", "orange", { direction: 'vert', cls: 'ants slow'}]
-            , ["red", "orange", { direction:'horiz', cls: 'ants slow'}]
+           // , ["red", "orange", { direction:'horiz', cls: 'ants slow'}]
             //, ["purple", "teal"]
             // , ["orange", "green"]
         ]
