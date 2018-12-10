@@ -27,40 +27,42 @@ path {
 #outer > div {
   min-width: 20px;
   min-height: 20px;
-  width: 100px;
+  width: 30px;
   background: #333;
-  height: 100px;
+  height: 30px;
   border-radius: 3px;
+  /* width: 1em; */
+  border-radius: 50%;
 }
 
 #outer #teal{
-  width:  6em;
-  height: 6em;
-  margin-left: 10%;
+  /* width:  6em; */
+  /* height: 6em; */
+  /* margin-left: 10%; */
   background-color: #008080;
 }
 
 #outer #orange{
-  width: 0%;
-  height:  4em;
-  padding: 2em 4em;
-  margin-top:  6em;
-  margin-left: 8em;
+  /* width: 0%; */
+  /* height:  4em; */
+  /* padding: 2em 4em; */
+  /* margin-top:  6em; */
+  /* margin-left: 8em; */
   background-color: #b0701e;
 }
 
 #outer #red{
-  width:   6em;
-  height:  4em;
-  padding: 4em 3em;
-  margin-left: 30%;
+  /* width:   6em; */
+  /* height:  4em; */
+  /* padding: 4em 3em; */
+  /* margin-left: 30%; */
   background-color: #8b2424;
 }
 
 #outer #aqua{
-	width:  5em;
-	height: 5em;
-	margin-left: 15%;
+	/* width:  5em; */
+	/* height: 5em; */
+	/* margin-left: 15%; */
 	background-color: #0697d187;
 }
 
@@ -68,6 +70,7 @@ path {
 	width: 15em;
 	height: 5em;
 	background-color:purple;
+	border-radius: 4px;
 }
 
 #outer #green{
