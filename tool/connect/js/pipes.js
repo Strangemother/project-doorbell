@@ -65,7 +65,7 @@ function drawPath(conf) {
     //A${delta} ${delta} 0 0 ${arc1} ${(startX + delta*signum(deltaX))} ${startY + 2*delta}
     let l = conf.pipe.join(' ')
     conf.path.attr("d", l)
-    //conf.path.attr('class', conf.cls)
+    conf.path.attr('class', conf.cls)
 }
 
 
@@ -132,7 +132,7 @@ var vert2Pipe = function(conf){
     if(isAbs(c)) {
         return verticalPipe(c)
     }
-    
+
     let aAboveB = c.ay > c.by;
     let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
     console.log(c._a.id, c._b.id, c.ay, c.by, aAboveB)
@@ -166,14 +166,14 @@ var vert2Pipe = function(conf){
         , x: c.bx
         , y: (c.ay + jointOffset + 3*d3.delta)
     }
-    
+
     let horizLength = (c.bx + d3.delta*signum(d3.deltaX))
 
     if(!aAboveB) {
         //ab.rx += 250
         //ab.rx += 50
        // ab.y -= d3.delta*signum(d3.deltaX)
-        //ab.x += 
+        //ab.x +=
         horizLength -= (d3.delta*signum(d3.deltaX))*2
         //console.log(jointOffset)
         //ab.sweep = !ab.sweep
@@ -205,47 +205,57 @@ var horiz2Pipe = function(conf) {
 
     let d3 =  getDeltaVert(c.ax, c.ay, c.bx, c.by, 12)
    // jointOffset = c.height / 3
-    let jointOffset = 10 // d3.delta
+    let jointOffset = 10//-c.width / 3
     let fromX = split - jointOffset
     let directionJointOffset = jointOffset
     //fromX = split + jointOffset
     let flip = false
-    if(c.bx < c.ax) {
+    let aBeforeB = c.bx < c.ax
+    let aAboveB = c.ay > c.by
+    if(aBeforeB) {
         flip = true
     }
-
+    
     if(flip) {
         directionJointOffset = jointOffset
         fromX = split + jointOffset
     }
 
-
     let ds = (directionJointOffset * signum(d3.deltaX))
 
-    let arcA = arc({
+    let arcA = {
         rx: jointOffset
         , ry: jointOffset
         , sweep: c.ax < c.bx // left or right bool.
         // x pos of end
         , x: split
         , y: flip?c.ay + jointOffset:c.ay + jointOffset //+ 3*d3.delta
-    })
+    }
 
-    let arcB = arc({
+    let arcB = {
         rx: jointOffset
         , ry: jointOffset
         , sweep: c.ax > c.bx // left or right bool.
         // x pos of end
         , x: flip? split - jointOffset:  split + jointOffset
         , y: c.by //+ 3*d3.delta
-    })
+    }
+
+    let vertLength = c.by - jointOffset
+    if(aAboveB) {
+        console.log('a above b')
+        arcA.y -= jointOffset * 2
+        arcA.sweep = !arcA.sweep 
+        arcB.sweep = !arcB.sweep 
+        vertLength += jointOffset * 2
+    }
 
     return [
         move(c.ax, c.ay)
         , horiz(fromX)
-        , arcA
-        , vert(c.by - jointOffset)
-        , arcB
+        , arc(arcA)
+        , vert(vertLength)
+        , arc(arcB)
         , horiz(c.bx)
 
     ]
