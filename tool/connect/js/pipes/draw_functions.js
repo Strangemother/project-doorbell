@@ -19,12 +19,22 @@ var adaptDrawLayer = function(conf) {
 function drawPath(conf) {
     // get the path's stroke width (if one wanted to be  really precize, one could use half the stroke size)
     //svg, path, _path, coord
-    conf.stroke =  parseFloat(conf.path.css("stroke-width"));
     conf.padding = 200
     adaptDrawLayer(conf)
     let l = conf.pipe.join(' ')
     conf.path.attr("d", l)
     conf.path.attr('class', conf.cls)
+    //conf.stroke =  parseFloat(conf.path.css("stroke-width"));
+    let $path = conf.path[0]
+    let width = conf.width == undefined? parseFloat(conf.path.css("stroke-width")): conf.width
+
+    if(typeof(conf.width) == 'number') {
+        width =  `${conf.width}px`; //Set stroke width
+    }
+
+    $path.style.stroke = conf.color || "#000"; //Set stroke colour
+    $path.style.strokeWidth = width
+    return $path
 }
 
 function getCoordsSpan(startElem, endElem, anchorA, anchorB){
@@ -37,39 +47,46 @@ function getCoordsSpan(startElem, endElem, anchorA, anchorB){
 }
 
 function connectElements(svg, path, startElem, endElem, config) {
+
+    if(startElem == undefined || endElem == undefined) {
+        return
+    }
+
     let isReverse = $(startElem).offset().top > $(endElem).offset().top
-    let name = config.direction || 'vert'
-    let coordOptions = [startElem, endElem]
+        , name = config.direction || 'vert'
+        , coordOptions = [startElem, endElem]
+        , func = window[`${name}2Pipe`]
+
     if(name == 'horiz') {
         coordOptions.push('right', 'left')
     }
-    let coord = getCoordsSpan.apply(this, coordOptions)
 
-    let func = window[`${name}2Pipe`]
-    //auto2Pipe
+    let coord = getCoordsSpan.apply(this, coordOptions)
+    let conf = Object.assign({}, config, {svg, isReverse, path, coord})
+
     if(func == undefined) {
         console.log('Function', name, 'does not exist')
-        return []
+        return
     }
-    let conf = Object.assign({}, config, {svg, isReverse, path, coord})
+
     conf.pipe = func(conf);
     drawPath(conf)
+    return conf
 }
 
 
 var getXY = function(elem, pos){
     elem = $(elem)
     var startCoord = elem.offset();
-    var svgContainer = $("#svgContainer");
-    // get (top, left) corner coordinates of the svg container
+    var svgContainer = svgContainerContext()
     var svgTop  = svgContainer.offset().top;
     var svgLeft = svgContainer.offset().left;
 
-    let per = .5;
+    let percentLeft = .5;
     let o = {
-        percentLeft: per
-        , x: startCoord.left + per * elem.outerWidth() - svgLeft    // x = left offset + 0.5*width - svg's left offset
-        , y:startCoord.top - svgTop        // y = top offset + height - svg's top offset
+        percentLeft
+        , x: startCoord.left + percentLeft * elem.outerWidth() - svgLeft
+        , y:startCoord.top - svgTop
     }
 
     return o

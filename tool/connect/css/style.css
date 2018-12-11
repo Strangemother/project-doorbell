@@ -112,3 +112,24 @@ path {
 button{
   padding: 1.5em;
 }
+
+
+#ball {
+  width: 10px;
+  height: 10px;
+  background-color: #7f3737;
+  border-radius: 50%;
+  /* offset-path: path("M126.09375 10 V86.28333333333333 A9.950000000000001 9.950000000000001 0 0 0 136.04375 96.23333333333333 H708.3468750000001 A9.950000000000001 9.950000000000001 0 0 1 718.296875 106.18333333333334 V209"); */
+  offset-distance: 20%;
+  animation: red-ball 16s linear alternate infinite;
+  animation-direction: normal;
+}
+
+@keyframes red-ball {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
