@@ -46,6 +46,7 @@ function getCoordsSpan(startElem, endElem, anchorA, anchorB){
     return new Coords2(start, end, startElem, endElem)
 }
 
+
 function connectElements(svg, path, startElem, endElem, config) {
 
     if(startElem == undefined || endElem == undefined) {
@@ -71,9 +72,39 @@ function connectElements(svg, path, startElem, endElem, config) {
 
     conf.pipe = func(conf);
     drawPath(conf)
+
+    drawDecorations(conf)
     return conf
 }
 
+var drawDecorations = function(config){
+
+    if(config.pulse){
+        if(config.edgeDecor == undefined) {
+            config.edgeDecor = {}
+        }
+
+        for (var i = 0; i < config.pulse.length; i++) {
+            let trackerConfig = config.pulse[i]
+            let namedTracker = config.edgeDecor[trackerConfig.name]
+            if(namedTracker == undefined) {
+                // generate new.
+                let id =  `tracker_${trackerConfig.name}`
+                if($(`#${id}`).length == 0) {
+                    let $tracker = $('<div/>', {'class': 'tracker', id:id})
+                    $tracker.prependTo('#nodes')
+                }
+
+                namedTracker = dynamicRule(`#${id}`, config.pipe)
+                config.edgeDecor[trackerConfig.name] = namedTracker
+            } else {
+                // update existing.
+                namedTracker.updatePath(path)
+            }
+
+        }
+    }
+}
 
 var getXY = function(elem, pos){
     elem = $(elem)
