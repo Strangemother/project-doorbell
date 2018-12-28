@@ -6,17 +6,54 @@ var options = new Vue({
     el: '#options'
     , data: {
         viewOpts:{}
+        , showPin: {}
+        , subTag: {parent: {}}
+        , showPinConfig: {}
     }
     , mounted(){
         bus.$on('config', this.setConfig.bind(this))
+        bus.$on('show-pin', this.showPinEvent.bind(this))
+
     }
 
     , methods: {
         setConfig(config){
             Vue.set(this, 'viewOpts', config.config)
         }
+
+        , showPinEvent(d) {
+
+            Vue.set(this, 'showPin', d )
+            Vue.set(this, 'showPinConfig', d.config)
+            Vue.set(this, 'subTag', { parent: {}, } )
+        }
+        , toggleShow(d){
+            d.show = !d.show
+        }
+
         , showClick() {
 
+        }
+
+        , deepPin(subTag, pin) {
+            Vue.set(this, 'subTag', subTag )
+
+        }
+
+        , addGroup(name, options){
+            let content = {
+                label: "Custom Label"
+                , show: true
+                , color: '#384697'
+                , desc: "Custom Desc."
+                , pins: [
+                    , altPin(GPIO._26, 'TDI (Alt4)')
+                ]
+            }
+
+            let group = Object.assign(content, options)
+            Vue.set(this.viewOpts, name, group)
+            return group
         }
     }
 })
@@ -53,11 +90,12 @@ var app = new Vue({
         }
 
         , clickPin(pin) {
-            debugger
+            console.log('clickPin', pin)
         }
 
         , clickPinLabel(pin) {
-            debugger
+            console.log('clickPinLabel', pin)
+            bus.$emit('show-pin', pin)
         }
     }
 })

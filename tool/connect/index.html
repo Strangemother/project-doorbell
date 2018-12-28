@@ -30,14 +30,17 @@
     <div class="node-names">
       <ul>
         <li>
-            <input type="text" v-model='inputV' @keyup.enter='items.push(inputV); inputV=""'>
+            <input type="text" v-model='inputV' @keyup.enter='addNodeEnter'>
         </li>
         <li v-for='item in items'>{{ item }}</li>
       </ul>
     </div>
 
+<div id="line"></div>
+<div class="edge-connect-button">
+    <a href="javascript:;" class="create-edge-connect">Connect</a>
 </div>
-
+</div>
 
 <!--  Try to resize the screen -->
 <!-- the connections should hold -->

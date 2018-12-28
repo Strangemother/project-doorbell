@@ -46,3 +46,36 @@ You'll boot into the REPL of the currently loop. Cancel it with CTRL+C if requir
 Write the scripts to the memory mount. Windows it's a mounted USB drive to the files.
 
     putty -serial COM7
+
+https://dietpi.com/#gettingstarted
+# Pi
+
+get version:
+    cat /etc/os-release
+
++ Speed up boot:
+    https://himeshp.blogspot.com/2018/08/fast-boot-with-raspberry-pi.html
+https://raw.githubusercontent.com/abock/image-usb-stick/master/image-usb-stick
+https://randomnerdtutorials.com/raspberry-pi-zero-usb-keyboard-hid/
+https://learn.adafruit.com/turning-your-raspberry-pi-zero-into-a-usb-gadget?view=all#other-modules
+
+remove bloat:
+    sudo apt purge libreoffice*
+    sudo apt clean
+    sudo apt autoremove
+
+
+Boot script automatically on system start
+Add to `/etc/rc.local`
+
+    python /path/to/script.py
+
+turn off on hdmi display.
+
+    vcgencmd display_power 0 # 1
+
+turn off/on sleep current sleep state
+
+    export DISPLAY=:0.0
+    xset dpms force on
+    xset dpms force off

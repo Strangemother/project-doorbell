@@ -9,10 +9,11 @@ div#pins {
 }
 
 #pins ul {
-    margin: 0;
+    /* margin: 0; */
     padding: 0;
     display: flex;
     flex-wrap: wrap;
+    margin: 0px 0.6em;
 }
 
 li.pin {
@@ -99,9 +100,10 @@ li.pin:nth-child(odd) .label {
     font-weight: 700;
     color: #333;
     width: 1.2rem;
-    text-align: center;
+    /* text-align: right; */
     font-size: 0.9em;
     display: flex;
+    flex-direction: row;
 }
 
 li.pin.PIN_POWER3 .number {
@@ -112,7 +114,9 @@ li.pin.BCM_GPIO {
     color: #828282;
 }
 
-.gpio {}
+.pin:nth-child(odd) .gpio {
+    flex-direction: row-reverse;
+}
 
 li.pin.PIN_GROUND {
     color: #b8b8b8;
@@ -132,7 +136,7 @@ li:hover.pin {
 
 li:hover.pin:nth-child(odd) {
     /* color: red; */
-    border-radius: 1px 15px 15px 0;
+    border-radius: 1px 20px 20px 0;
 }
 
 .visible {
@@ -189,6 +193,7 @@ li.tag-item {
     display: flex;
     justify-content: center;
     align-items: center;
+    /* flex-direction: row-reverse; */
 }
 
 li.tag-item.tag.type.index.hidden {
@@ -215,8 +220,10 @@ ul.options {
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    border: solid 3px #444;
+    /* border: solid 3px #444; */
     border-radius: 4px;
+    width: 50%;
+    height: fit-content;
 }
 
 .option-item label {
@@ -306,3 +313,110 @@ html, body{
   right: 50px;
 }
 
+
+
+li:hover.pin:nth-child(1) {
+    border-radius: 2px;
+}
+
+div#pi.small {
+    font-size: 0.7em;
+    width: 59%;
+    background: #f7f7f7;
+}
+
+.gpio i.material-icons {
+    font-size: 1.3em;
+}
+
+.pin:nth-child(odd) .type.raw {
+    flex-direction: row-reverse;
+}
+
+.name + .index {
+    /* color: red; */
+    margin: 0em 0em 0 0.4em;
+}
+
+#pins .pin:nth-child(odd) ul.tags {
+    /* border: solid 1px; */
+    margin-left: 0;
+}
+
+#pins .pin:nth-child(even) ul.tags {
+    margin-right: 0;
+}
+
+.action-info {
+    display: flex;
+    font-size: 1.2em;
+}
+
+.action-info .icon {
+    font-size: inherit;
+}
+
+div#options {
+    display: flex;
+    border: solid 2px #444;
+}
+
+.show-pin {
+    width: 50%;
+}
+
+.desc {
+    /* min-height: 13em; */
+    font-size: 1em;
+    /* border: solid; */
+    line-height: 1.5em;
+    margin: 0.5em 0.7em 1em;
+}
+
+.types ul.tags {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li.tag-link {
+    background: #DDD;
+    margin: 1px;
+    padding: 0.2em 0.3em;
+}
+
+.sub-desc .action-info .icon {
+    min-width: 1em;
+    min-height: 1em;
+}
+
+.alt-pins.list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.tag-link, .for-pin {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+}
+
+.for-pin {
+    /* border: solid 1px; */
+    border-radius: 50%;
+    font-size: 0.9em;
+    padding: 0.3em;
+    width: 1em;
+    height: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin: 0.2em 0em 0.2em 0.4em;
+}

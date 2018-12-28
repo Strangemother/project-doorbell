@@ -1,8 +1,9 @@
 
+var connections = {}
 var lines = [
     //["teal", "orange", { direction: 'vert'}]
     //, ["red", "orange"]
-    ["teal", "aqua", { direction: 'auto'}]
+    //["teal", "aqua", { direction: 'auto'}]
     //, ["red", "aqua", { direction:'horiz'}]
     //, ["purple", "teal"]
     // , ["orange", "green"]
@@ -62,7 +63,16 @@ class Paths {
     }
 
     addEdge(a,b){
-        lines.push([a,b])
+        lines.push([a,b, this.defaultEdge()])
+    }
+
+    defaultEdge(){
+        return {
+            direction: 'auto'
+            , width: '3px'
+            , color: 'red'
+            , pulse: []
+        }
     }
 }
 
@@ -87,42 +97,57 @@ var svgContext = function(){
 
 function connectAll() {
     let svg = svgContext()
-    lines = nodes.lines
-    connections = []
+    lines = window.nodes_app? nodes_app.lines: []
+    //connections = []
     // connect all the paths you want!
+   
     for (var i = 0; i < lines.length; i++) {
-        let a,b,c = {}
+        let a,b,c; 
+
         if(lines[i].length == 2){
             [a,b] = lines[i]
         }
+        
         if(lines[i].length == 3){
             [a,b,c] = lines[i]
         }
+        
+        let _na = typeof(a) != 'string'? $(a)[0].id: a;
+        let _nb = typeof(b) != 'string'? $(b)[0].id: b;
+        let name = `path-${_na}-${_nb}`;
 
-        let name = `path${i+1}`;
-        let $path = $(`#${name}`)
-        let $a = $(`#${a}`)[0];
-        let $b = $(`#${b}`)[0];
+        c = c == undefined? connections[name] || {}: c
+        
+      //  debugger
+        let $path = $( `#${c.name || name}`)
+        let $a = typeof(a) == 'string'? $(`#${a}`)[0]: a;
+        let $b = typeof(b) == 'string'? $(`#${b}`)[0]: b;
         if($a == undefined || $b == undefined) {
             continue
         }
         if($path.length == 0) {
             //$path = $('<path/>', { id:name})
             // $path.appendTo(svg)
+            console.log('Generating new path', name)
             $path = newPath(svg, name)
+            c.name = name
         }
 
         let con = connectElements(svg, $path, $a,   $b, c);
         if(con != undefined) {
-            connections.push(con)
+            let v =Object.assign(connections[name] || {}, con)
+            if(connections[name] == undefined) {
+                connections[name] = v
+            }
+        }
+
+        if(connections[name]) {
+            connections[name].line = lines[i]
+            connections[name].lineIndex = i
         }
     }
-
-
-
 }
 
-var connections
 
 var newPath = function(svg, name){
     var $path = document.createElementNS("http://www.w3.org/2000/svg", 'path'); //Create a path in SVG's namespace

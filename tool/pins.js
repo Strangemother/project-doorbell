@@ -20,6 +20,39 @@ for (var i = 0; i < 40; i++) {
     DPI[`_${i}`] = { type: 'DPI', index: i }
 }
 
+
+var tagComp = Vue.component('tag-item', {
+    template: `<span class='tag-item'><span class='name'>{{ label() }}</span><span class='index' v-if='complex'>{{ labelPin() }}</span></span>`
+    , props: ['item']
+    , data(){
+        return {
+            complex: false
+        }
+    }
+    , methods: {
+        label() {
+            let name = this.item.name;
+            if( typeof(name) == 'object') {
+                // complex name
+                this.complex = true
+                return name.type
+            }
+
+            return name;
+        }
+
+        , labelPin(){
+            if( typeof(this.item.name) == 'object') {
+                // complex this.item.name
+                return this.item.name.index
+            }
+
+            return ''
+        }
+    }
+})
+
+
 var pin = function(value){
 
     if(value == SETUP) {

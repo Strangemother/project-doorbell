@@ -3,9 +3,22 @@
 var adaptDrawLayer = function(conf) {
     // check if the svg is big enough to draw the path, if not, set heigh/width
     //conf = svg, coord, padding
-    if (conf.svg.attr("height") <  conf.coord.by)  {
+
+    if ($(conf.svg).height()< $(window).height()) {
+        //conf.svg.attr("height", $(window).height() - 10)
+    }
+
+    //conf.svg.attr("width", $(window).width() - 10)
+
+    //console.log(conf.svg.attr("height") , conf.coord.by + conf.padding )
+    if (conf.svg.attr("height") <  conf.coord.by + conf.padding )  {
         conf.svg.attr("height", conf.coord.by + conf.padding);
     }
+
+    if (conf.svg.attr("height") <  conf.coord.ay + conf.padding)  {
+        conf.svg.attr("height", conf.coord.ay + conf.padding);
+    }
+
 
     if (conf.svg.attr("width" ) < (conf.coord.ax + conf.padding) ) {
         conf.svg.attr("width", (conf.coord.ax + conf.padding));
@@ -63,47 +76,79 @@ function connectElements(svg, path, startElem, endElem, config) {
     }
 
     let coord = getCoordsSpan.apply(this, coordOptions)
-    let conf = Object.assign({}, config, {svg, isReverse, path, coord})
+    let connection = Object.assign({}, config, {svg, isReverse, path, coord})
 
     if(func == undefined) {
         console.log('Function', name, 'does not exist')
         return
     }
 
-    conf.pipe = func(conf);
-    drawPath(conf)
+    connection.pipe = func(connection);
+    drawPath(connection)
 
-    drawDecorations(conf)
-    return conf
+    drawDecorations(connection)
+    return connection
 }
 
-var drawDecorations = function(config){
+var drawDecorations = function(connection){
 
-    if(config.pulse){
-        if(config.edgeDecor == undefined) {
-            config.edgeDecor = {}
-        }
-
-        for (var i = 0; i < config.pulse.length; i++) {
-            let trackerConfig = config.pulse[i]
-            let namedTracker = config.edgeDecor[trackerConfig.name]
-            if(namedTracker == undefined) {
-                // generate new.
-                let id =  `tracker_${trackerConfig.name}`
-                if($(`#${id}`).length == 0) {
-                    let $tracker = $('<div/>', {'class': 'tracker', id:id})
-                    $tracker.prependTo('#nodes')
-                }
-
-                namedTracker = dynamicRule(`#${id}`, config.pipe)
-                config.edgeDecor[trackerConfig.name] = namedTracker
-            } else {
-                // update existing.
-                namedTracker.updatePath(path)
-            }
-
-        }
+    if(connection.pulse){
+        refreshTrackers(connection)
     }
+}
+
+var addTracker = function(connection, config) {
+    if(connection.pulse == undefined) {
+        connection.pulse = []
+    }
+    connection.pulse.push(config)
+    return refreshTrackers(connection)
+}
+
+var refreshTrackers = function(connection){
+    let result = []
+    if(connection == undefined) {
+        console.warn('refreshTrackers received an undefined connection.')
+        return []
+    }
+    if(connection.edgeDecor == undefined) {
+        connection.edgeDecor = {}
+    }
+
+    for (var i = 0; i < connection.pulse.length; i++) {
+        let trackerConfig = connection.pulse[i]
+        if(trackerConfig == undefined) {
+            console.warn('ignoring tracker', i, connection)
+            continue
+        }
+        let namedTracker = connection.edgeDecor[trackerConfig.name]
+        if(namedTracker == undefined) {
+            namedTracker = createTracker(trackerConfig, connection)
+            connection.edgeDecor[trackerConfig.name] = namedTracker
+        } else {
+            // update existing.
+            namedTracker.updateAttr('path', connection.path)
+        }
+        result.push(namedTracker)
+    }
+
+    return result;
+}
+
+var createTracker = function(trackerConfig, connection){
+    // generate new.
+    let name = trackerConfig.name || (Math.random().toString().slice(2))
+    let id =  `tracker_${trackerConfig.name}`
+    if($(`#${id}`).length == 0) {
+        let $tracker = $('<div/>', {
+            'class': 'tracker ' + (trackerConfig['classes'] || '')
+            , id:id
+        })
+        $tracker.prependTo('#nodes')
+    }
+
+    let namedTracker = dynamicRule(`#${id}`, connection.pipe, trackerConfig)
+    return namedTracker
 }
 
 var getXY = function(elem, pos){
@@ -160,7 +205,15 @@ var vert2Pipe = function(conf){
     /* A pipe from A (top) to B (bottom) with two joints*/
     let c = conf.coord
 
-    if(isAbs(c)) { return verticalPipe(c) }
+    //if(isAbs(c)) { return verticalPipe(c) }
+
+    if(isAbs(c)) {
+        if(Math.abs(c.bx - c.ax) < Math.abs(c.by - c.ay)) {
+            return verticalPipe(c)
+        }
+        return horiz2Pipe(conf)
+
+    }
 
     let miniJointOffset = 30
         , d3 =  getDelta(c.ax, c.ay, c.bx, c.by, miniJointOffset/2)
@@ -172,7 +225,7 @@ var vert2Pipe = function(conf){
            d3.delta =  d3.delta * .5
     }
 
-    let aAboveB = c.ay > c.by
+    let aBelowB = c.ay > c.by
         , jointOffset = c.height / 3
         , rev = conf.isReverse
         , va = c.ax > c.bx ? jointOffset: jointOffset
@@ -202,10 +255,20 @@ var vert2Pipe = function(conf){
         , y: (c.ay + jointOffset + 3*d3.delta)
     }
 
+    let ydelta =  (arcB.y - c.by)
 
+    // The first node is below the second node
+    // the horizontal delta is less than the arcB curve
+    // (finish point) - Therefore the next draw will not
+    // be smooth.
+    // correct the arcB out Y.
+    if(aBelowB && ydelta < 0 && ydelta+1 > arcB.ry){
+        //console.log(ydelta)
+        arcB.y -= ydelta
+    }
     let horizLength = (c.bx + d3.delta*signum(d3.deltaX))
 
-    if(!aAboveB) {
+    if(!aBelowB) {
         arcB.y = (c.ay + jointOffset + 3*d3.delta)
         horizLength -= (d3.delta*signum(d3.deltaX))*2
     }
@@ -229,18 +292,38 @@ var vert2Pipe = function(conf){
 
 var horiz2Pipe = function(conf) {
     let c = conf.coord
-    if(isAbs(c)) {  return horizPipe(c) }
+    if(isAbs(c)) {
+        if(Math.abs(c.bx - c.ax) < Math.abs(c.by - c.ay)) {
+            return vert2Pipe(conf)
+        }
+        return horizPipe(c)
+    }
     //fromX = split + jointOffset
    // jointOffset = c.height / 3
     let d3 =  getDelta(c.ax, c.ay, c.bx, c.by, 12)
         , split = c.bx - ((c.bx - c.ax)/2)
-        , jointOffset = 10//-c.width / 3
-        , directionJointOffset = jointOffset
+        , jointOffset =Math.abs(d3.delta)//-c.width / 3
+        , jointOffsetMin = conf.joinMin == undefined? 5: conf.joinMin
+        , jointOffsetMax = conf.joinMax == undefined? 15: conf.joinMax
+
+        ;
+
+    if(jointOffset < jointOffsetMin) {
+        jointOffset = jointOffsetMin
+    }
+
+    if(jointOffset > jointOffsetMax) {
+        jointOffset = jointOffsetMax
+    }
+
+    let directionJointOffset = jointOffset
         , fromX = split - jointOffset
         , flip = false
         , aBeforeB = c.bx < c.ax
         , aAboveB = c.ay > c.by
         , vertLength = c.by - jointOffset
+        , crackedJoint = Math.abs(c.ay - c.by) < jointOffset *2
+
 
     if(aBeforeB) {
         flip = true
@@ -249,6 +332,7 @@ var horiz2Pipe = function(conf) {
     if(flip) {
         directionJointOffset = jointOffset
         fromX = split + jointOffset
+
     }
 
     //let ds = (directionJointOffset * signum(d3.deltaX))
@@ -262,6 +346,7 @@ var horiz2Pipe = function(conf) {
         , y: flip?c.ay + jointOffset:c.ay + jointOffset //+ 3*d3.delta
     }
 
+
     let arcB = {
         rx: jointOffset
         , ry: jointOffset
@@ -271,12 +356,23 @@ var horiz2Pipe = function(conf) {
         , y: c.by //+ 3*d3.delta
     }
 
+
+
     if(aAboveB) {
         arcA.y -= jointOffset * 2
         arcA.sweep = !arcA.sweep
         arcB.sweep = !arcB.sweep
         vertLength += jointOffset * 2
     }
+    //console.log(Math.abs(c.ay - c.by), jointOffset * 2)
+    if(crackedJoint) {
+       arcA.y += ((c.ay - c.by) * .5)
+       arcA.ry -= Math.abs(((c.ay - c.by) * .5))
+       arcB.y += ((c.ay - c.by) * .5)
+       arcB.ry -= Math.abs((c.ay - c.by) * .5)
+       //vertLength = ((c.ay - c.by) * .5) -1
+    }
+
 
     return [
         move(c.ax, c.ay)

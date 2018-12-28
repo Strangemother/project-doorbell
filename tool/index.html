@@ -15,28 +15,11 @@
       <line id="line"/>
     </svg> -->
 
-    <div id="options">
-        <ul class="options">
-            <li class="option-item" v-for='(item, key) in viewOpts'>
-                <label>
-                    <div :class="[item.show?'show':'not-show','color-label']" :style="{ background: item.color, color: item.color }">
-                        <div class="icon">
-                            <i class="material-icons">{{ item.icon }}</i>
-                        </div>
-                    </div>
-                    <input type="checkbox" v-model='item.show' @click='showClick'>
-                        <span class="label-value">{{ key }}</span>
-                </label>
-            </li>
-        </ul>
-    </div>
-
-
     <div id="pi">
         <div id="pins">
             <ul>
-                <li class="pin" v-for='cell in cells' :class='[cell.type]'>
-                    <div  @click='clickPin(cell)' class="number">{{ cell.number }}</div>
+                <li class="pin" @click='clickPin(cell)'  v-for='cell in cells' :class='[cell.type]'>
+                    <div  class="number">{{ cell.number }}</div>
                     <div class="label" @click='clickPinLabel(cell)'>
 
                         <div class="visible">
@@ -51,20 +34,89 @@
                                 <div v-if='cell.friendly == undefined' class="type value">{{ cell.type }}</div>
 
                                 <ul class='tags'>
-                                    <li :style='{background: item.parent.color}' :class="['tag-item tag', key, item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>{{ item.name }}</li>
+                                    <li :style='{background: item.parent.color}' :class="['tag-item tag', key, item.name, {hidden: !item.parent.show}]" v-for='(item, key) in cell.tags'>
+                                        <tag-item :item='item'></tag-item>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
 
                         <div class="gpio" :style="{ color: cell.config.color }" >
                             <i class="material-icons">{{ cell.icon }}</i>
-                            <span v-if='cell.gpio'>{{ cell.gpio }}</span>
+                            <span v-if='cell.gpio != undefined'>{{ cell.gpio }}</span>
                         </div>
                     </div>
                 </li>
             </ul>
         </div>
     </div>
+
+    <div id="options">
+        <ul class="options">
+            <li class="option-item" v-for='(item, key) in viewOpts'>
+                <label>
+                    <div :class="[item.show?'show':'not-show','color-label']" :style="{ background: item.color, color: item.color }">
+                        <div class="icon">
+                            <i class="material-icons">{{ item.icon }}</i>
+                        </div>
+                    </div>
+                    <input type="checkbox" v-model='item.show' @click='showClick'>
+                        <span class="label-value">{{ key }}</span>
+                </label>
+            </li>
+        </ul>
+
+        <div class="show-pin">
+            <div class="action-info">
+
+                <div class="icon" :style="{ color: showPinConfig.color }">
+                    <div class="material-icons">{{ showPinConfig.icon }}</div>
+                </div>
+                <div class="label">{{ showPinConfig.label }}</div>
+                <div  @click='toggleShow(showPinConfig)'  class="show">Show: {{ showPinConfig.show }}</div>
+            </div>
+            <div class="types">
+                <ul class='tags'>
+                    <li class='tag-link'@click='deepPin(item, showPin)' v-for='item in showPin.tags'>
+                        <tag-item class='tag' :item=item></tag-item>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="desc">
+                <p>{{showPinConfig.desc}}</p>
+            </div>
+            <div class="sub-desc">
+                <div class="action-info">
+                    <div class="icon" :style="{ background: subTag.parent.color }"></div>
+                    <div class="label">{{ subTag.parent.label }}</div>
+                    <div @click='toggleShow(subTag.parent)' class="show">Show: {{ subTag.parent.show }}</div>
+                </div>
+                <div class="desc">
+                    <p>{{ subTag.parent.desc }}</p>
+                </div>
+                <div class="alt pins">
+                    <ul class='alt-pins list'>
+                        <li class='tag-link'
+                            v-if='subTag.parent.pins != undefined'
+                            v-for='pin in subTag.parent.pins'>
+                            <div class="name">
+                                <tag-item :item=pin></tag-item>
+                            </div>
+                            <div class="for-pin" :style='{background: pin.parent.color }'>
+                                <div class="pin-index index-value">{{ pin.for.pin }}</div>
+                                <!-- <div class="gpio-index index-value">{{ item.for.gpio }}</div> -->
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
     <script
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
