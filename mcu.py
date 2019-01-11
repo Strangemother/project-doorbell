@@ -15,8 +15,9 @@ led = pyb.LED(1)
 led2 = pyb.LED(2)
 
 # pi input reset pin
-pi_reset = Pin('X4', pyb.Pin.OUT_PP)
+pi_reset = Pin('Y12', pyb.Pin.OUT_PP)
 pi_reset.high()
+
 
 def push_button_press(e):
     led2.toggle()

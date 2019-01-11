@@ -91,14 +91,26 @@ CS8 = 4435
 D8  = 4699
 DS8 = 4978
 
-# set up pin PWM timer for output to buzzer or speaker
-p2 = Pin("Y12") # Pin Y2 with timer 8 Channel 2
-tim = Timer(1, freq=3000)
-ch = tim.channel(3, Timer.PWM, pin=p2)
-tim.freq(262)
-ch.pulse_width_percent(30)
-pyb.delay(300)
-ch.pulse_width_percent(0)
+
+def setup(pin='Y12', timer=1, channel=3):
+    """
+    To use the pin, channel and timer call 'setup()' before tone functions.
+    The timer and channel change depending upon the pin.
+
+        http://micropython.org/resources/pybv10-pinout.jpg
+
+        tone.setup('Y9', 2, 3)
+    """
+    global ch
+    global tim
+    # set up pin PWM timer for output to buzzer or speaker
+    p2 = Pin(pin) # Pin Y2 with timer 8 Channel 2
+    tim = Timer(timer, freq=3000)
+    ch = tim.channel(channel, Timer.PWM, pin=p2)
+    tim.freq(262)
+    ch.pulse_width_percent(30)
+    pyb.delay(300)
+    ch.pulse_width_percent(0)
 
 
 # play all tone
@@ -126,6 +138,7 @@ def beep(count=1, delay=70, tone=C7):
         ch.pulse_width_percent(0)
         pyb.delay(delay)
     ch.pulse_width_percent(0)
+
 
 def slide(start=30, stop=5000, delay=60):
     ch.pulse_width_percent(70)
